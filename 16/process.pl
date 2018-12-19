@@ -122,19 +122,74 @@ my $OPS = {
 	},
 };
 
-my @examples = load_examples();
-my $count = 0;
-my $i = 0;
-foreach my $example (@examples)
-{
-	my $possible_opcodes = test_instruction($example->{before}, $example->{instruction}, $example->{after});
 
-	my $opcode_count = scalar @{$possible_opcodes};
-	$count++ if $opcode_count >= 3;
-	$i++;
-	print "$i: $opcode_count ($count) - " . join(',', sort @{$possible_opcodes}) . "\n";
+
+
+my @examples = load_examples();
+insert_op_codes(@examples);
+
+set_registers([0,0,0,0]);
+my @program = load_program();
+foreach my $inst (@program)
+{
+	my $fn = $OPS->{$inst->[0]};
+	&{$fn}($inst->[1], $inst->[2], $inst->[3]);
+	print join(',',@{$REGISTERS}) . "\n";
 }
-print "$i $count\n";
+
+
+
+
+#my $count = 0;
+#my $i = 0;
+#foreach my $example (@examples)
+#{
+#	my $possible_opcodes = test_instruction($example->{before}, $example->{instruction}, $example->{after});
+#
+#	my $opcode_count = scalar @{$possible_opcodes};
+#	$count++ if $opcode_count >= 3;
+#	$i++;
+#	print "$i: $opcode_count ($count) - " . join(',', sort @{$possible_opcodes}) . "\n";
+#}
+#print "$i $count\n";
+
+sub insert_op_codes
+{
+	my (@examples) = @_;
+
+	my $op_code_map = {};
+
+	while (1)
+	{
+		my $updated_flag = 0;	
+		foreach my $example (@examples)
+		{
+			my $possible_opcodes = test_instruction($example->{before}, $example->{instruction}, $example->{after});
+
+			my $filtered_op_codes = [];
+			foreach my $op_code (@{$possible_opcodes})
+			{
+				push @{$filtered_op_codes}, $op_code unless (defined $op_code_map->{$op_code});
+			}
+
+			if (scalar @{$filtered_op_codes} == 1)
+			{
+				$op_code_map->{$filtered_op_codes->[0]} = $example->{instruction}->[0];
+				$updated_flag = 1;
+			}
+
+		}
+
+		last unless $updated_flag;
+	}
+
+	foreach my $op_code (keys %{$op_code_map})
+	{
+		$OPS->{$op_code_map->{$op_code}} = $OPS->{$op_code};
+	}
+
+}
+
 
 sub test_instruction
 {
@@ -220,6 +275,28 @@ sub load_examples
 	return @examples;
 }
 
+sub load_program
+{
+	open FILE, 'input.txt' or die "couldn't open input.txt\n";
+
+	my @program = ();
+
+	my $instruction = undef;
+	while (my $line = <FILE>)
+	{
+		if ($line =~ m/^([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)/)
+		{
+			$instruction = [int $1,int $2,int $3,int $4];
+		}
+		if ($line =~ m/^After:/)
+		{
+			$instruction = undef;
+			next;
+		}
+		push @program, $instruction if $instruction;
+	}
+	return @program;
+}
 
 sub test_ops
 {
