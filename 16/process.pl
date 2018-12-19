@@ -76,48 +76,53 @@ my $OPS = {
 	{
 		my ($a, $b, $c) = @_;
 		validate_registers($b,$c);
-		$REGISTERS->[$c] = 0;
-		$REGISTERS->[$c] = 1 if $a > $REGISTERS->[$b];
+		my $result = 0;
+		$result = 1 if $a > $REGISTERS->[$b];
+		$REGISTERS->[$c] = $result;
 	},
 	gtri => sub
 	{
 		my ($a, $b, $c) = @_;
 		validate_registers($a,$c);
-		$REGISTERS->[$c] = 0;
-		$REGISTERS->[$c] = 1 if $REGISTERS->[$a] > $b;
+		my $result = 0;
+		$result = 1 if $REGISTERS->[$a] > $b;
+		$REGISTERS->[$c] = $result;
 	},
 	gtrr => sub
 	{
 		my ($a, $b, $c) = @_;
 		validate_registers($a,$b,$c);
-		$REGISTERS->[$c] = 0;
-		$REGISTERS->[$c] = 1 if $REGISTERS->[$a] > $REGISTERS->[$b];
+		my $result = 0;
+		$result = 1 if $REGISTERS->[$a] > $REGISTERS->[$b];
+		$REGISTERS->[$c] = $result;
 	},
 	eqir => sub
 	{
 		my ($a, $b, $c) = @_;
 		validate_registers($b,$c);
-		$REGISTERS->[$c] = 0;
-		$REGISTERS->[$c] = 1 if $a == $REGISTERS->[$b];
+		my $result = 0;
+		$result = 1 if $a == $REGISTERS->[$b];
+		$REGISTERS->[$c] = $result;
 	},
 	eqri => sub
 	{
 		my ($a, $b, $c) = @_;
 		validate_registers($a,$c);
-		$REGISTERS->[$c] = 0;
-		$REGISTERS->[$c] = 1 if $REGISTERS->[$a] == $b;
+		my $result = 0;
+		$result = 1 if $REGISTERS->[$a] == $b;
+		$REGISTERS->[$c] = $result;
 	},
 	eqrr => sub
 	{
 		my ($a, $b, $c) = @_;
 		validate_registers($a,$b,$c);
-		$REGISTERS->[$c] = 0;
-		$REGISTERS->[$c] = 1 if $REGISTERS->[$a] == $REGISTERS->[$b];
+		my $result = 0;
+		$result = 1 if $REGISTERS->[$a] == $REGISTERS->[$b];
+		$REGISTERS->[$c] = $result;
 	},
 };
 
 my @examples = load_examples();
-
 my $count = 0;
 my $i = 0;
 foreach my $example (@examples)
